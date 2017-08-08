@@ -2,8 +2,8 @@
 #include <GLFW/glfw3.h>
 
 #include <iostream>
-#include <math.h>
 #include "Shader/Shader.h"
+
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height){
     glViewport(0, 0, width, height);
@@ -16,10 +16,19 @@ void processInput(GLFWwindow *window){
 }
 
 int main() {
-    glfwInit();
+    if(!(bool)glfwInit()){
+        std::cerr << "Failed to initialize glfw" << std::endl;
+        return -1;
+    }
+
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_ANY_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+#ifdef __APPLE__
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+#endif
 
 
     // window creation
@@ -33,7 +42,7 @@ int main() {
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
     // glad initialization
-    if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)){
+    if(!(bool)gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)){
         std::cout << "Failed to initialize GLAD" << std::endl;
         return -1;
     }
@@ -76,7 +85,7 @@ int main() {
 
     glBindVertexArray(0);
 
-    while(!glfwWindowShouldClose(window)){
+    while(!(bool)glfwWindowShouldClose(window)){
         // process input
         processInput(window);
 
