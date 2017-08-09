@@ -24,6 +24,7 @@ add_subdirectory(${PROJECT_SOURCE_DIR}/${EXTERNAL_LIBRARIES}/glad)
 ##############################################################
 include_directories("${EXTERNAL_LIBRARIES}/glad/include")
 include_directories("${EXTERNAL_LIBRARIES}/stb_image")
+include_directories("${EXTERNAL_LIBRARIES}/glm-0.9.8.4")
 
 ##############################################################
 # Build Program
