@@ -11,7 +11,7 @@ Shader::Shader(const GLchar* vertexPath, const GLchar* fragmentPath){
 
     int success;
     glGetProgramiv(ID, GL_LINK_STATUS, &success);
-    if(!success)
+    if(!(bool)success)
     {
         char infoLog[512];
         glGetProgramInfoLog(ID, 512, NULL, infoLog);
@@ -38,7 +38,7 @@ GLuint Shader::loadShader(const char* filePath, GLuint type){
         shaderFile.close();
 
         codeString = shaderStream.str();
-    } catch(std::ifstream::failure e) {
+    } catch(std::ifstream::failure &e) {
         std::cerr << "failed to read: " << filePath << std::endl;
     }
 
@@ -50,7 +50,7 @@ GLuint Shader::loadShader(const char* filePath, GLuint type){
     glCompileShader(shader);
 
     glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-    if(!success)
+    if(!(bool)success)
     {
         char infoLog[512];
         glGetShaderInfoLog(shader, 512, NULL, infoLog);
