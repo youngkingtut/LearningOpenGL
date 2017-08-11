@@ -9,10 +9,20 @@
 #include <iostream>
 
 #include "Shader/Shader.h"
+#include "camera.h"
 
+Camera camera = Camera();
+
+float deltaTime = 0.0f;
+float lastFrame = 0.0f;
+float lastX = 400;
+float lastY = 300;
+bool firstMouse = true;
 
 void frame_buffer_size_callback(GLFWwindow* window, int width, int height);
-void processInput(GLFWwindow *window);
+void processInput(GLFWwindow* window);
+void mouse_callback(GLFWwindow* window, double xPos, double yPos);
+void scroll_callback(GLFWwindow* window, double xOffset, double yOffset);
 
 int main() {
     if(!(bool)glfwInit()){
@@ -39,6 +49,9 @@ int main() {
     }
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, frame_buffer_size_callback);
+    glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetScrollCallback(window, scroll_callback);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     // glad initialization
     if(!(bool)gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)){
@@ -150,16 +163,18 @@ int main() {
     shaderProgram.use();
     shaderProgram.setInt("texture1", 0);
 
-//    glm::mat4 model;
     glm::mat4 view;
     glm::mat4 projection;
-    projection = glm::perspective(glm::radians(45.0f), 800.0f/600, 0.1f, 100.0f);
-    view = glm::translate(view, glm::vec3(0.0f, 0.0f, -10.0f));
-//    model = glm::rotate(model, glm::radians(20.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
     while(!(bool)glfwWindowShouldClose(window)){
+        // timing
+        float currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+
         // process input
         processInput(window);
+        projection = glm::perspective(glm::radians(camera.Zoom), 800.0f/600, 0.1f, 100.0f);
 
         // render
         glClearColor(0.8f, 1.0f, 1.0f, 1.0f);
@@ -168,6 +183,8 @@ int main() {
         glBindTexture(GL_TEXTURE_2D, texture);
         shaderProgram.use();
         glBindVertexArray(VAO);
+
+        view = camera.GetViewMatrix();
 
         for(unsigned int i = 0; i < 10; i++){
             glm::mat4 model;
@@ -211,4 +228,34 @@ void processInput(GLFWwindow *window){
     if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS){
         glfwSetWindowShouldClose(window, 1);
     }
+
+    if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        camera.ProcessKeyboard(Camera_Movement::FORWARD, deltaTime);
+    if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        camera.ProcessKeyboard(Camera_Movement::BACKWARD, deltaTime);
+    if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        camera.ProcessKeyboard(Camera_Movement::LEFT, deltaTime);
+    if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        camera.ProcessKeyboard(Camera_Movement::RIGHT, deltaTime);
+}
+
+
+void mouse_callback(GLFWwindow* window, double xPos, double yPos)
+{
+    if(firstMouse)
+    {
+        lastX = (float)xPos;
+        lastY = (float)yPos;
+        firstMouse = false;
+    }
+
+    float xOffset = (float)xPos - lastX;
+    float yOffset = lastY - (float)yPos;
+    lastX = (float)xPos;
+    lastY = (float)yPos;
+    camera.ProcessMouseMovement(xOffset, yOffset);
+}
+
+void scroll_callback(GLFWwindow* window, double xOffset, double yOffset){
+    camera.ProcessMouseScroll((float)yOffset);
 }

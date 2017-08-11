@@ -32,7 +32,8 @@ include_directories("${EXTERNAL_LIBRARIES}/glm-0.9.8.4")
 add_executable(learningOpenGL
         ${SOURCE_FILES}/main.cpp
         ${SOURCE_FILES}/Shader/Shader.cpp
-        ${SOURCE_FILES}/Shader/Shader.h)
+        ${SOURCE_FILES}/Shader/Shader.h
+        ${SOURCE_FILES}/camera.h)
 target_link_libraries(learningOpenGL glfw)
 target_link_libraries(learningOpenGL glad)
 
