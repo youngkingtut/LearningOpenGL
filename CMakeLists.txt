@@ -18,13 +18,13 @@ set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 
 add_subdirectory(${PROJECT_SOURCE_DIR}/${EXTERNAL_LIBRARIES}/glfw-3.2.1)
 add_subdirectory(${PROJECT_SOURCE_DIR}/${EXTERNAL_LIBRARIES}/glad)
+add_subdirectory(${PROJECT_SOURCE_DIR}/${EXTERNAL_LIBRARIES}/glm-0.9.8.4)
 
 ##############################################################
 # Includes
 ##############################################################
 include_directories("${EXTERNAL_LIBRARIES}/glad/include")
 include_directories("${EXTERNAL_LIBRARIES}/stb_image")
-include_directories("${EXTERNAL_LIBRARIES}/glm-0.9.8.4")
 
 ##############################################################
 # Build Program
@@ -33,9 +33,10 @@ add_executable(learningOpenGL
         ${SOURCE_FILES}/main.cpp
         ${SOURCE_FILES}/Shader/Shader.cpp
         ${SOURCE_FILES}/Shader/Shader.h
-        ${SOURCE_FILES}/camera.h)
+        ${SOURCE_FILES}/Camera)
 target_link_libraries(learningOpenGL glfw)
 target_link_libraries(learningOpenGL glad)
+target_link_libraries(learningOpenGL glm)
 
 
 ##############################################################

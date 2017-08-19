@@ -9,7 +9,7 @@
 #include <iostream>
 
 #include "Shader/Shader.h"
-#include "camera.h"
+#include "Camera/camera.h"
 
 Camera camera = Camera();
 
@@ -65,7 +65,7 @@ int main() {
 
 
     // set up vertex data
-    float vertices[] = {
+    float boxVertices[] = {
             // positions            // texture
              0.5f,  0.5f,  0.5f,   1.0f, 1.0f,
              0.5f, -0.5f,  0.5f,   1.0f, 0.0f,
@@ -95,18 +95,24 @@ int main() {
              0.5f, -0.5f,  0.5f,   1.0f, 1.0f,
              0.5f, -0.5f, -0.5f,   1.0f, 0.0f,
             -0.5f, -0.5f, -0.5f,   0.0f, 0.0f,
-            -0.5f, -0.5f,  0.5f,   0.0f, 1.0f
+            -0.5f, -0.5f,  0.5f,   0.0f, 1.0f,
 
+             100.0f, -1.0f, 100.0f,  1.0f, 1.0f,
+             100.0f, -1.0f,-100.0f,  1.0f, 0.0f,
+            -100.0f, -1.0f,-100.0f,  0.0f, 0.0f,
+            -100.0f, -1.0f, 100.0f,  0.0f, 1.0f
+    };
 
+    unsigned int boxIndices[] = {
+             0,  1,  3,  1,  2,  3,
+             4,  5,  7,  5,  6,  7,
+             8,  9, 11,  9, 10, 11,
+            12, 13, 15, 13, 14, 15,
+            16, 17, 19, 17, 18, 19,
+            20, 21, 23, 21, 22, 23,
+            24, 25, 27, 25, 26, 27
     };
-    unsigned int indices[] = {
-            0,1,3,1,2,3,
-            4,5,7,5,6,7,
-            8,9,11,9,10,11,
-            12,13,15,13,14,15,
-            16,17,19,17,18,19,
-            20,21,23,21,22,23
-    };
+
     glm::vec3 cubePositions[] = {
             glm::vec3( 0.0f,  0.0f,  0.0f),
             glm::vec3( 2.0f,  5.0f, -15.0f),
@@ -128,15 +134,16 @@ int main() {
 
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+    glBufferData(GL_ARRAY_BUFFER, sizeof(boxVertices), boxVertices, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(boxIndices), boxIndices, GL_STATIC_DRAW);
+
+    glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(1);
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), nullptr);
-    glEnableVertexAttribArray(0);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
 
     glBindVertexArray(0);
 
@@ -168,7 +175,7 @@ int main() {
 
     while(!(bool)glfwWindowShouldClose(window)){
         // timing
-        float currentFrame = glfwGetTime();
+        float currentFrame = (float)glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
@@ -186,18 +193,22 @@ int main() {
 
         view = camera.GetViewMatrix();
 
-        for(unsigned int i = 0; i < 10; i++){
+        for(unsigned int i = 0; i < 1; i++){
             glm::mat4 model;
             model = glm::translate(model, cubePositions[i]);
-            float angle = 20.0f * (i+1);
-            if(i%3 == 0)
-                angle = (float)glfwGetTime()* 1.0f * (i+1);
+            float angle = 20.0f * (i);
+//            if(i%3 == 0)
+//                angle = (float)glfwGetTime()* 1.0f * (i+1);
 
             model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
             int modelLoc = glGetUniformLocation(shaderProgram.ID, "model");
             glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
             glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
         }
+
+        glm::mat4 model;
+
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(36 * sizeof(float)));
 
         int viewLoc = glGetUniformLocation(shaderProgram.ID, "view");
         int projectionLoc = glGetUniformLocation(shaderProgram.ID, "projection");
